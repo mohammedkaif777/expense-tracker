@@ -18,10 +18,6 @@ We’ll now:
 2. Introduce **CSV handling with Python’s `csv` module**.  
 3. Practice **committing and pushing to GitHub**.  
 
----
 
-Before we move to that part — confirm:
-- You ran the script and it works ✅  
-- You made your first `git commit` ✅  
 
 Once you confirm those two, I’ll show you how to **add CSV saving + loading** — your first real data persistence system (used in almost every backend).
