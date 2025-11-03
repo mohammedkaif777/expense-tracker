@@ -1,44 +1,36 @@
-from expenses.io_manager import load_expenses, save_expenses
-from expenses.analytics import show_summary
-from expenses.validation import get_valid_amount, get_valid_date
+from db_manager import create_table, add_expense, get_all_expenses
 from tabulate import tabulate
+import logging
 
-def add_expense(expenses):
-    category = input("Enter category: ").strip().title()
-    amount = get_valid_amount()
-    if amount is None: return
-    date = get_valid_date()
-    if date is None: return
-    expenses.append({"date": date, "category": category, "amount": amount})
-    save_expenses(expenses)
-    print("Expense added successfully!")
 
-def view_expenses(expenses):
+def add_expense_ui():
+    date = input("Enter date (YYYY-MM-DD): ")
+    category = input("Enter category: ")
+    amount = float(input("Enter amount: "))
+    add_expense(date, category, amount)
+    logging.info("Expense added successfully!")
+
+def view_expenses_ui():
+    expenses = get_all_expenses()
     if not expenses:
         print("No expenses recorded yet.")
-        return
-    table = [[e["date"], e["category"], e["amount"]] for e in expenses]
-    print(tabulate(table, headers=["Date", "Category", "Amount"], tablefmt="grid"))
-    total = sum(e["amount"] for e in expenses)
-    print(f"\nTotal Spent: ₹{total}")
+    else:
+        print(tabulate(expenses, headers=["Date", "Category", "Amount"], tablefmt="grid"))
 
 def main():
-    expenses = load_expenses()
-    print("Welcome To Expense-Daily")
+    create_table()
+    print("\nWelcome To Expense-Daily\n")
     while True:
-        print("\n1. Add Expense\n2. View Expenses\n3. View Summary\n4. Exit")
-        choice = input("Choose an Option: ").strip()
+        print("1. Add Expense\n2. View Expenses\n3. Exit")
+        choice = input("Choose an Option: ")
         if choice == "1":
-            add_expense(expenses)
+            add_expense_ui()
         elif choice == "2":
-            view_expenses(expenses)
+            view_expenses_ui()
         elif choice == "3":
-            show_summary(expenses)
-        elif choice == "4":
-            print("Goodbye!")
             break
         else:
-            print("Invalid choice!")
+            print("Invalid choice. Try again.")
 
 if __name__ == "__main__":
     main()
