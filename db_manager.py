@@ -13,21 +13,25 @@ def create_table():
     with get_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            CREATE TABLE IF NOT EXISTS expenses (
+                CREATE TABLE IF NOT EXISTS expenses (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 date TEXT NOT NULL,
                 category TEXT NOT NULL,
-                amount REAL NOT NULL
-            )
+                amount REAL NOT NULL,
+                description TEXT
+                )
         """)
         conn.commit()
 
-def add_expense(date, category, amount):
+def add_expense(date, category, amount, description=None):
     with get_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO expenses (date, category, amount) VALUES (?, ?, ?)",
-                       (date, category, amount))
+        cursor.execute("""
+            INSERT INTO expenses (date, category, amount, description)
+            VALUES (?, ?, ?, ?)
+        """, (date, category, amount, description))
         conn.commit()
+
 
 def get_all_expenses():
     with get_connection() as conn:
@@ -44,7 +48,7 @@ def get_expense_by_category(category):
 def get_expense_by_date(date):
     with get_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute("SELET date, category, amount FROM expenses WHERE date=?",(date,))
+        cursor.execute("SELECT date, category, amount FROM expenses WHERE date=?",(date,))
         return cursor.fetchall()
     
 def get_summary():
@@ -58,4 +62,33 @@ def get_summary():
                 (SELECT category FROM expenses GROUP BY category ORDER BY SUM(amount) DESC LIMIT 1) AS top_category
             FROM expenses
         """)
-        return cursor.fetchall()
+        row = cursor.fetchone()
+        return {
+            "total_entries": row[0],
+            "total_spent": row[1],
+            "avg_expense": row[2],
+            "top_category": row[3]
+        }
+
+def update_expense(expense_id, new_date, new_category, new_amount, new_description):
+    """Update an expense record by ID."""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE expenses
+            SET date = ?, category = ?, amount = ?, description = ?
+            WHERE id = ?
+        """, (new_date, new_category, new_amount, new_description, expense_id))
+        conn.commit()
+        return cursor.rowcount  # returns how many rows were updated
+
+
+def delete_expense(expense_id):
+    """Delete an expense record by ID."""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM expenses WHERE id = ?", (expense_id,))
+        conn.commit()
+        return cursor.rowcount  # returns how many rows were deleted
+
+
