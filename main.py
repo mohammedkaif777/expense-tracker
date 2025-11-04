@@ -4,7 +4,9 @@ from db_manager import (
     get_all_expenses,
     get_expense_by_category,
     get_expense_by_date,
-    get_summary
+    get_summary,
+    delete_expense,
+    update_expense
 )
 
 def add_expense_ui():
@@ -52,6 +54,60 @@ def show_summary():
     print(f"Average Expense: ₹{summary['avg_expense'] or 0:.2f}")
     print(f"Top Category: {summary['top_category'] or 'N/A'}")
 
+def edit_expense_ui():
+    expenses = get_all_expenses()
+    if not expenses:
+        print("\nNo expenses to edit.")
+        return
+
+    print("\n--- All Expenses ---")
+    for idx, exp in enumerate(expenses, start=1):
+        print(f"{idx}. Date: {exp[0]}, Category: {exp[1]}, Amount: ₹{exp[2]}")
+
+    try:
+        expense_id = int(input("\nEnter the ID of the expense to edit: "))
+    except ValueError:
+        print("Invalid input. Please enter a valid number.")
+        return
+
+    new_date = input("Enter new date (YYYY-MM-DD): ")
+    new_category = input("Enter new category: ")
+    try:
+        new_amount = float(input("Enter new amount: "))
+    except ValueError:
+        print("Invalid amount.")
+        return
+    new_description = input("Enter new description (optional): ") or None
+
+    updated = update_expense(expense_id, new_date, new_category, new_amount, new_description)
+    if updated:
+        print("✅ Expense updated successfully.")
+    else:
+        print("❌ Expense not found.")
+
+
+def delete_expense_ui():
+    expenses = get_all_expenses()
+    if not expenses:
+        print("\nNo expenses to delete.")
+        return
+
+    print("\n--- All Expenses ---")
+    for idx, exp in enumerate(expenses, start=1):
+        print(f"{idx}. Date: {exp[0]}, Category: {exp[1]}, Amount: ₹{exp[2]}")
+
+    try:
+        expense_id = int(input("\nEnter the ID of the expense to delete: "))
+    except ValueError:
+        print("Invalid input. Please enter a valid number.")
+        return
+
+    deleted = delete_expense(expense_id)
+    if deleted:
+        print("✅ Expense deleted successfully.")
+    else:
+        print("❌ Expense not found.")
+
 def main():
     create_table()
     print("\nWelcome To Expense-Daily\n")
@@ -63,6 +119,9 @@ def main():
         print("4. View by Date")
         print("5. Summary")
         print("6. Exit")
+        print("7. Edit Expense")
+        print("8. Delete Expense")
+        print("9. Exit")
 
         choice = input("Choose an option: ")
 
@@ -77,6 +136,10 @@ def main():
         elif choice == "5":
             show_summary()
         elif choice == "6":
+            edit_expense_ui()
+        elif choice == "7":
+            delete_expense_ui()
+        elif choice == "8":
             print("Goodbye!")
             break
         else:

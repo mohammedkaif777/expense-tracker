@@ -70,3 +70,25 @@ def get_summary():
             "top_category": row[3]
         }
 
+def update_expense(expense_id, new_date, new_category, new_amount, new_description):
+    """Update an expense record by ID."""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE expenses
+            SET date = ?, category = ?, amount = ?, description = ?
+            WHERE id = ?
+        """, (new_date, new_category, new_amount, new_description, expense_id))
+        conn.commit()
+        return cursor.rowcount  # returns how many rows were updated
+
+
+def delete_expense(expense_id):
+    """Delete an expense record by ID."""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM expenses WHERE id = ?", (expense_id,))
+        conn.commit()
+        return cursor.rowcount  # returns how many rows were deleted
+
+
