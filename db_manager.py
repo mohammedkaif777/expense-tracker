@@ -34,3 +34,28 @@ def get_all_expenses():
         cursor = conn.cursor()
         cursor.execute("SELECT date, category, amount FROM expenses")
         return cursor.fetchall()
+    
+def get_expense_by_category(category):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT date, category, amount FROM expenses WHERE category = ?",(category,))
+        return cursor.fetchall()
+    
+def get_expense_by_date(date):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELET date, category, amount FROM expenses WHERE date=?",(date,))
+        return cursor.fetchall()
+    
+def get_summary():
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT 
+                COUNT(*) AS total_entries,
+                SUM(amount) AS total_spent,
+                AVG(amount) AS avg_expense,
+                (SELECT category FROM expenses GROUP BY category ORDER BY SUM(amount) DESC LIMIT 1) AS top_category
+            FROM expenses
+        """)
+        return cursor.fetchall()
