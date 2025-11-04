@@ -8,14 +8,16 @@ from db_manager import (
     delete_expense,
     update_expense
 )
+from validators import get_valid_amount, get_valid_category, get_valid_date
 
 def add_expense_ui():
-    date = input("Enter date (YYYY-MM-DD): ")
-    category = input("Enter category: ")
-    amount = float(input("Enter amount: "))
-    description = input("Enter description (optional): ") or None
+    print("\n📝 Add Expense")
+    date = get_valid_date()
+    category = get_valid_category()
+    amount = get_valid_amount()
+    description = input("Enter description(optional): ").strip()
     add_expense(date, category, amount, description)
-    print("\n✅ Expense added successfully!")
+    print("✅ Expense added successfully!")
 
 def view_all_expenses():
     expenses = get_all_expenses()
