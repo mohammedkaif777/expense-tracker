@@ -8,14 +8,18 @@ from db_manager import (
     delete_expense,
     update_expense
 )
+from validators import get_valid_amount, get_valid_category, get_valid_date
+from exporter import export_to_csv, export_to_json
+
 
 def add_expense_ui():
-    date = input("Enter date (YYYY-MM-DD): ")
-    category = input("Enter category: ")
-    amount = float(input("Enter amount: "))
-    description = input("Enter description (optional): ") or None
+    print("\n📝 Add Expense")
+    date = get_valid_date()
+    category = get_valid_category()
+    amount = get_valid_amount()
+    description = input("Enter description(optional): ").strip()
     add_expense(date, category, amount, description)
-    print("\n✅ Expense added successfully!")
+    print("✅ Expense added successfully!")
 
 def view_all_expenses():
     expenses = get_all_expenses()
@@ -118,10 +122,11 @@ def main():
         print("3. View by Category")
         print("4. View by Date")
         print("5. Summary")
-        print("6. Exit")
-        print("7. Edit Expense")
-        print("8. Delete Expense")
-        print("9. Exit")
+        print("6. Edit Expense")
+        print("7. Delete Expense")
+        print("8. Export to CSV")
+        print("9. Export to JSON")
+        print("10. Exit")
 
         choice = input("Choose an option: ")
 
@@ -140,6 +145,10 @@ def main():
         elif choice == "7":
             delete_expense_ui()
         elif choice == "8":
+            export_to_csv()
+        elif choice == "9":
+            export_to_json()
+        elif choice == "10":
             print("Goodbye!")
             break
         else:
