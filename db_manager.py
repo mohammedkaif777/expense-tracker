@@ -89,5 +89,21 @@ def delete_expense(expense_id):
         cursor.execute("DELETE FROM expenses WHERE id = ?", (expense_id,))
         conn.commit()
 
+def get_expense_by_id(expense_id):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, date, category, amount, description FROM expenses WHERE id = ?", (expense_id,))
+        return cursor.fetchone()
+
+def update_expense(expense_id, date, category, amount, description):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE expenses
+            SET date = ?, category = ?, amount = ?, description = ?
+            WHERE id = ?
+        """, (date, category, amount, description, expense_id))
+        conn.commit()
+
 
 
