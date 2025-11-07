@@ -36,7 +36,7 @@ def add_expense(date, category, amount, description=None):
 def get_all_expenses():
     with get_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT date, category, amount FROM expenses")
+        cursor.execute("SELECT id, date, category, amount, description FROM expenses")
         return cursor.fetchall()
     
 def get_expense_by_category(category):
@@ -84,11 +84,26 @@ def update_expense(expense_id, new_date, new_category, new_amount, new_descripti
 
 
 def delete_expense(expense_id):
-    """Delete an expense record by ID."""
     with get_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("DELETE FROM expenses WHERE id = ?", (expense_id,))
         conn.commit()
-        return cursor.rowcount  # returns how many rows were deleted
+
+def get_expense_by_id(expense_id):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, date, category, amount, description FROM expenses WHERE id = ?", (expense_id,))
+        return cursor.fetchone()
+
+def update_expense(expense_id, date, category, amount, description):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE expenses
+            SET date = ?, category = ?, amount = ?, description = ?
+            WHERE id = ?
+        """, (date, category, amount, description, expense_id))
+        conn.commit()
+
 
 
